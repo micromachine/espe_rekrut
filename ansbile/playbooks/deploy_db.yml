@@ -1,0 +1,10 @@
+---
+- hosts: '{{ host }}'
+  gather_facts: false
+  any_errors_fatal: false
+  become: true
+  become_method: sudo
+  vars_files:
+    - ../vars/mysql.yml
+  tasks:
+   - include: ../tasks/deploy_db.yml

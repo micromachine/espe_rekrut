@@ -1,0 +1,9 @@
+---
+docker_img: percona
+master_directory:  
+   - /dockers_persistent/master/data
+   - /dockers_persistent/master/cnf
+slave_directory:
+   - /dockers_persistent/slave/data
+   - /dockers_persistent/slave/cnf
+rootpw: Rekrutacja

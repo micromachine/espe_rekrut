@@ -1,0 +1,13 @@
+---
+- hosts: '{{ host }}'
+  gather_facts: false
+  become: true
+  become_method: sudo
+  pre_tasks:
+    - name: 'docker-py'
+      raw: apt-get install python-docker -y
+  vars_files:
+    - ../vars/mysql.yml
+  tasks:
+   - include: ../tasks/docker_mysql.yml
+

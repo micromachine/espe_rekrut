@@ -1,0 +1,38 @@
+- name: Install required packagaes
+  apt:
+    package=ufw
+    state=present
+
+- name: Enable ufw
+  ufw: state=enabled
+
+- name: Set policy
+  ufw: direction={{ item.direction }} policy={{ item.policy }}
+  with_items:
+    - { direction: 'incoming', policy: 'deny' }
+    - { direction: 'outgoing', policy: 'allow' }
+
+- name: Set default rules
+  ufw: rule={{ item.rule }} port={{ item.port }} proto={{ item.proto }}
+  with_items:
+    - { rule: 'limit', port: '{{ ssh_port | default("22") }}', proto: 'tcp' }
+#    - { rule: 'allow', port: '80', proto: 'tcp' }
+
+- ufw:
+    rule: allow
+    port: 8080
+    src: '{{ item }}'
+    proto: tcp
+  with_items:
+    - 18.195.252.232
+    - 52.29.180.86
+    - 52.57.158.39
+    - 35.156.197.211
+
+- name: Enable ufw logging
+  ufw: logging=on
+
+- name:  Ufw restart
+  service:
+    name=ufw
+    state=restarted

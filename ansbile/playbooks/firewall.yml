@@ -1,0 +1,8 @@
+---
+- hosts: '{{ host }}'
+  gather_facts: false
+  any_errors_fatal: true
+  become: true
+  become_method: sudo
+  tasks:
+   - include: ../tasks/ufw.yml

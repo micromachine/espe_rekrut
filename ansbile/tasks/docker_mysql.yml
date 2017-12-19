@@ -1,0 +1,82 @@
+---
+- name: pull an image
+  docker_image:
+    name: "{{docker_img}}"
+
+- name: create directory for masterdb
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items: "{{master_directory}}"
+  when: is_master
+
+- name: create directory for slavedb
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items: "{{slave_directory}}"
+  when: is_slave
+
+- name: create config for mysql master
+  blockinfile:
+    create: yes
+    path: /dockers_persistent/master/cnf/config-file.cnf
+    block: |
+      [mysqld]
+      server-id=1
+      binlog_format=ROW
+      log-bin
+  when: is_master
+- name: create config for mysql master
+  blockinfile:
+    create: yes
+    path: /dockers_persistent/slave/cnf/config-file.cnf
+    block: |
+      [mysqld]
+      server-id=2
+  when: is_slave
+
+- name: create container for masterdb
+  command: docker run --name masterdb -p 3306:3306 -v /dockers_persistent/master/cnf:/etc/mysql/conf.d -v /dockers_persistent/master/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD="{{rootpw}}" -d percona:latest
+  when: is_master
+
+- name: create container for slavedb
+  command: docker run --name slavedb -p 3306:3306 -v /dockers_persistent/slave/cnf:/etc/mysql/conf.d -v /dockers_persistent/slave/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD="{{rootpw}}" -d percona:latest
+  when: is_slave
+
+- name: create grant.sql
+  blockinfile:
+    create: yes
+    path: /tmp/grant.sql
+    block: |
+      GRANT REPLICATION SLAVE ON *.* TO repl@'%' IDENTIFIED BY '{{rootpw}}';
+      flush privileges;
+  when: is_master
+
+- name: execute grant
+  shell: docker exec -i masterdb mysql -u root -p{{rootpw}}  < /tmp/grant.sql
+  when: is_master
+
+- name: remove grant file
+  file:
+    path: /tmp/grant.sql
+    state: absent
+  when: is_master
+
+- name: get binlog position
+  shell:  docker exec -i masterdb mysql -uroot -p{{rootpw}} -e "SHOW MASTER STATUS\G" |grep "File"  | awk {'print $2'}
+  register: binlog
+  when: is_master
+
+- name: get binlog position
+  shell:  docker exec -i masterdb mysql -uroot -p{{rootpw}} -e "SHOW MASTER STATUS\G" |grep "Position"  | awk {'print $2'}
+  register: position
+  when: is_master
+
+- debug:
+    msg: "{{binlog.stdout}} -> {{ position.stdout}}"
+
+
+
+
+

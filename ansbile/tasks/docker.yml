@@ -1,0 +1,52 @@
+---
+- name: install docker binary
+  apt:
+    name: docker.io
+    state: present
+
+- copy: src=../templates/sed.sh dest=/home/ubuntu/dockerfile/sed.sh mode=0755
+
+- name: Execute the script
+  command: sh /home/ubuntu/dockerfile/sed.sh
+
+- name: reload docker
+  shell: systemctl restart docker
+
+- name: create directory for data
+  file:
+    path: /dockers_persistent/data/www
+    state: directory
+    mode: 0755
+
+- name: create directory for docker file
+  file:
+    path: /home/ubuntu/dockerfile
+    state: directory
+    mode: 0755
+
+- name: copy docker templates
+  action: template src=../templates/dockerfile/{{ item }} dest=/home/ubuntu/dockerfile/{{ item }}
+  with_items:
+   - default.conf
+   - Dockerfile
+   - php-fpm.conf
+   - supervisord.conf
+
+#- name: stop container
+#  command: docker stop espeo_container
+#
+#- name: rm container
+#  command: docker rm espeo_container
+#
+#- name: remove img if exist
+#  command: docker rmi -f espeo_image
+#
+#- name: clean up
+#  shell: docker images | grep none | awk {'print $3'} | xargs docker rmi -f
+
+- name: build docker img
+  # docker build --rm -t espeo_image .
+  command: docker build --rm -t espeo_image /home/ubuntu/dockerfile
+
+- name: run container
+  command: docker run -d -p  8080:8080 -v /dockers_persistent/data/www:/var/www/html/public --name espeo_container espeo_image:latest

@@ -1,0 +1,14 @@
+---
+- name: create sql file on slave
+  blockinfile:
+    create: yes
+    path: /tmp/commands.sql
+    block: |
+      change master to master_host="ec2-52-29-180-86.eu-central-1.compute.amazonaws.com",master_user="repl",master_password="{{rootpw}}",master_log_file="{{binlog}}",master_log_pos={{position}};
+
+- name: execute grant
+  shell: docker exec -i slavedb mysql -u root -p{{rootpw}}  < /tmp/commands.sql
+
+- name: start slave
+  shell:  docker exec -i slavedb mysql -uroot -p{{rootpw}} -e "START SLAVE;"
+

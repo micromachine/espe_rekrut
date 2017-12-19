@@ -1,0 +1,11 @@
+---
+- hosts: '{{ host }}'
+  gather_facts: false
+  any_errors_fatal: true
+  become: true
+  become_method: sudo
+#  pre_tasks:
+#    - name: 'install python'
+#      raw: sudo apt-get -y install python
+  tasks:
+   - include: ../tasks/test.yml

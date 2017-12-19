@@ -1,0 +1,31 @@
+---
+#- name: copy db template
+#  action: template src=../templates/database.sql dest=/tmp/db.sql
+#
+#- name: execute grant
+#  shell: docker exec -i masterdb mysql -u root -p{{rootpw}}  < /tmp/db.sql
+
+- name: set fw ruels for db
+  ufw:
+    rule: allow
+    port: 3306
+    src: '{{ item }}'
+    proto: tcp
+  with_items:
+    - 18.195.252.232
+    - 52.29.180.86
+    - 52.57.158.39
+    - 35.156.197.211
+
+
+- name: set fw ruels for db
+  ufw:
+    rule: allow
+    port: 8080
+    src: '{{ item }}'
+    proto: tcp
+  with_items:
+    - 18.195.252.232
+    - 52.29.180.86
+    - 52.57.158.39
+    - 35.156.197.211

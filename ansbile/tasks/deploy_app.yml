@@ -1,0 +1,11 @@
+---
+- name: install git
+  apt:
+    name: git
+    state: present
+
+- name: git clone
+  git:
+    repo: https://gitlab.nucleos.pl/greg/espeo.git
+    dest: /dockers_persistent/data/www/
+

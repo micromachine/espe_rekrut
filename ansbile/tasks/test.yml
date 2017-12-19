@@ -1,0 +1,6 @@
+- name: Check version
+  command: cat /etc/debian_version
+  register : sys_version
+
+- debug:
+   msg:  "{{ sys_version }}"
