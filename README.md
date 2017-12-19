@@ -14,3 +14,8 @@ ansible-playbook playbooks/deploy_db.yml --private-key=/home/gkurkowiak2/.ssh/es
 
 ```
 
+
+## Wykorzystane mechanizmy : 
+* Loadbalancer Haproxy - rozwiazanie pozwala na transparentne dla klienta sterowanie ruchem http a także na szybką rozbudowę klastra o nowe nody. 
+* Docker - pozwala na separacje procesów 
+* Mysql - kalaster active-passive 
