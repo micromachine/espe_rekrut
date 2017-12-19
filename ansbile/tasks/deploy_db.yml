@@ -1,9 +1,9 @@
 ---
-#- name: copy db template
-#  action: template src=../templates/database.sql dest=/tmp/db.sql
-#
-#- name: execute grant
-#  shell: docker exec -i masterdb mysql -u root -p{{rootpw}}  < /tmp/db.sql
+- name: copy db template
+  action: template src=../templates/database.sql dest=/tmp/db.sql
+
+- name: execute grant
+  shell: docker exec -i masterdb mysql -u root -p{{rootpw}}  < /tmp/db.sql
 
 - name: set fw ruels for db
   ufw:

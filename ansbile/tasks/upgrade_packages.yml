@@ -1,2 +1,2 @@
 - name: Up all packages on system.
-  shell: sudo apt-get update
+  shell: sudo apt-get update -y
